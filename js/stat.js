@@ -1,22 +1,35 @@
 'use strict';
-var CLOUD_WIDTH = 420;
-var CLOUD_HEIGHT = 270;
-var CLOUD_X = 100;
-var CLOUD_Y = 10;
-var GAP = 10;
+
+var cloud = {
+  X: 100,
+  Y: 10,
+  WIDTH: 420,
+  HEIGHT: 270,
+  COLOR: 'rgb(255, 255, 255, 1)',
+  SHADOW_COLOR: 'rgba(0, 0, 0, 0.7)'
+};
+
+var fontStyle = {
+  FONT: '16px PT Mono',
+  COLOR: 'rgba(0, 0, 0, 1)',
+  ALIGN: 'center',
+  BASELINE: 'hanging'
+};
+
+var GAP = 10; // стандартный отступ
 
 // Функция отрисовки "попапа"
-var renderCloud = function(ctx, color, x, y) {
+var renderCloud = function (ctx, color, x, y) {
   ctx.fillStyle = color;
-  ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
+  ctx.fillRect(x, y, cloud.WIDTH, cloud.HEIGHT);
 };
 
 // Функция с характеристиками текста
-var renderText = function(ctx, text, x, y) {
-  ctx.fillStyle = '#000';
-  ctx.font = '16px PT Mono';
-  ctx.textBaseline = 'hanging';
-  ctx.textAlign = "center";
+var renderText = function (ctx, text, x, y) {
+  ctx.fillStyle = fontStyle.COLOR;
+  ctx.font = fontStyle.FONT;
+  ctx.textAlign = fontStyle.ALIGN;
+  ctx.textBaseline = fontStyle.BASELINE;
   ctx.fillText(text, x, y);
 };
 
@@ -27,38 +40,37 @@ var getRandomColor = function () {
   return randomBlue;
 };
 
-var getMaxElement = function(arr) {
+var getMaxElement = function (arr) {
   var maxElement = arr[0];
-
   for (var i = 0; i < arr.length; i++) {
     if (arr[i] > maxElement) {
       maxElement = arr[i];
     }
   }
-
   return maxElement;
 };
 
-window.renderStatistics = function(ctx, players, times) {
-  renderCloud(ctx, 'rgba(0, 0, 0, 0.7)', CLOUD_X + GAP, CLOUD_Y + GAP); // Тень
-  renderCloud(ctx, '#fff', CLOUD_X, CLOUD_Y); // Облако
+window.renderStatistics = function (ctx, players, times) {
+  renderCloud(ctx, cloud.SHADOW_COLOR, cloud.X + GAP, cloud.Y + GAP); // Тень
+  renderCloud(ctx, cloud.COLOR, cloud.X, cloud.Y); // Облако
 
-  var headerX = CLOUD_X + CLOUD_WIDTH / 2; // Середина облака
-  renderText(ctx, 'Ура вы победили!', headerX, CLOUD_Y + GAP*2);
-  renderText(ctx, 'Список результатов:', headerX, CLOUD_Y + GAP*4);
+  var headerX = cloud.X + cloud.WIDTH / 2; // Середина облака
+  renderText(ctx, 'Ура вы победили!', headerX, cloud.Y + GAP * 2);
+  renderText(ctx, 'Список результатов:', headerX, cloud.Y + GAP * 4);
 
   var maxTime = getMaxElement(times);
 
   for (var i = 0; i < players.length; i++) {
-    ctx.fillStyle = players[i] == 'Вы' ? 'rgba(255, 0, 0, 1)' : getRandomColor();  // определяем цвет столбца
-
+    var PLAYER_COLOR = 'rgba(255, 0, 0, 1)';
     var GRAPH_HEIGHT = 150;
     var BAR_WIDTH = 40;
     var BAR_GAP = 50;
     var barHeight = GRAPH_HEIGHT * times[i] / maxTime; // расчет высоты столбца
-    var barX = CLOUD_X + BAR_GAP + (BAR_WIDTH + BAR_GAP) * i; // расчет Х-координаты столбца
-    var barY = CLOUD_HEIGHT - GAP - 20; // 20 от нижнего края облака
-    var pointsY = barY - barHeight - 2*GAP; // расчет Y-координаты для вывода очков
+    var barX = cloud.X + BAR_GAP + (BAR_WIDTH + BAR_GAP) * i; // расчет Х-координаты столбца
+    var barY = cloud.HEIGHT - GAP - 20; // 20 от нижнего края облака
+    var pointsY = barY - barHeight - 2 * GAP; // расчет Y-координаты для вывода очков
+
+    ctx.fillStyle = players[i] === 'Вы' ? PLAYER_COLOR : getRandomColor(); // определяем цвет столбца
 
     ctx.fillRect(barX, barY, BAR_WIDTH, (-1) * barHeight);
     renderText(ctx, players[i], barX + BAR_WIDTH / 2, barY + GAP); // Х-координата берется с середины столбца
